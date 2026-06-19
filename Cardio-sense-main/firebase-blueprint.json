@@ -1,0 +1,81 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Unique identifier for the user" },
+        "name": { "type": "string", "description": "User's full name" },
+        "email": { "type": "string", "format": "email", "description": "User's email address" },
+        "profileImage": { "type": "string", "description": "URL to the user's profile image" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when the user account was created" }
+      },
+      "required": ["userId", "name", "email"]
+    },
+    "BPReading": {
+      "title": "BPReading",
+      "description": "Blood pressure reading data",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Identifier of the user who owns the reading" },
+        "systolic": { "type": "number", "description": "Systolic blood pressure value" },
+        "diastolic": { "type": "number", "description": "Diastolic blood pressure value" },
+        "pulse": { "type": "number", "description": "Pulse rate value" },
+        "battery": { "type": "number", "description": "Device battery percentage" },
+        "deviceStatus": { "type": "string", "description": "Status of the device (e.g., 'connected', 'disconnected')" },
+        "status": { "type": "string", "description": "Computed BP status (e.g., 'Normal', 'High', 'Low')" },
+        "timestamp": { "type": "string", "format": "date-time", "description": "Timestamp of the reading" }
+      },
+      "required": ["userId", "systolic", "diastolic", "pulse", "timestamp"]
+    },
+    "DoctorAccessLink": {
+      "title": "DoctorAccessLink",
+      "description": "Secure access link for physicians",
+      "type": "object",
+      "properties": {
+        "token": { "type": "string", "description": "Secure random token (UUID)" },
+        "patientUserId": { "type": "string", "description": "User ID of the patient" },
+        "doctorName": { "type": "string", "description": "Optional name of the doctor" },
+        "doctorEmail": { "type": "string", "format": "email", "description": "Optional email of the doctor" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the link was created" },
+        "expiresAt": { "type": "string", "format": "date-time", "description": "When the link expires" },
+        "isActive": { "type": "boolean", "description": "Whether the link is currently active" },
+        "permissionLevel": { "type": "string", "enum": ["view", "download", "emergency"], "description": "Level of access granted" }
+      },
+      "required": ["token", "patientUserId", "createdAt", "expiresAt", "isActive", "permissionLevel"]
+    },
+    "AccessLog": {
+      "title": "AccessLog",
+      "description": "Audit log of physician access",
+      "type": "object",
+      "properties": {
+        "token": { "type": "string", "description": "Token used for access" },
+        "patientUserId": { "type": "string", "description": "User ID of the patient accessed" },
+        "doctorEmail": { "type": "string", "format": "email", "description": "Email of the doctor who accessed" },
+        "doctorName": { "type": "string", "description": "Name of the doctor who accessed" },
+        "accessTime": { "type": "string", "format": "date-time", "description": "When the access occurred" },
+        "userAgent": { "type": "string", "description": "Browser user agent" }
+      },
+      "required": ["token", "patientUserId", "doctorEmail", "accessTime"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Collection of user profiles"
+    },
+    "/readings/{readingId}": {
+      "schema": "BPReading",
+      "description": "Collection of blood pressure readings"
+    },
+    "/doctorAccessLinks/{tokenId}": {
+      "schema": "DoctorAccessLink",
+      "description": "Collection of secure physician access links"
+    },
+    "/accessLogs/{logId}": {
+      "schema": "AccessLog",
+      "description": "Audit logs for physician access"
+    }
+  }
+}

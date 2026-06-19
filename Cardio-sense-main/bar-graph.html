@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CardioSense - Health Improvement Bar Graph</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #f0f4f8;
+    font-family: 'Inter', 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px;
+  }
+
+  .chart-container {
+    width: 900px;
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 50px 60px 40px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  }
+
+  .chart-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: #1e3a8a;
+    text-align: center;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  .chart-subtitle {
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .chart-area {
+    display: flex;
+    align-items: flex-end;
+    gap: 0;
+    position: relative;
+    height: 400px;
+    padding-left: 70px;
+    padding-bottom: 60px;
+  }
+
+  /* Y-axis */
+  .y-axis {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 60px;
+    width: 65px;
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: space-between;
+  }
+
+  .y-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-align: right;
+    padding-right: 10px;
+    position: relative;
+  }
+
+  .y-axis-title {
+    position: absolute;
+    left: -30px;
+    top: 50%;
+    transform: translateY(-50%) rotate(-90deg);
+    font-size: 13px;
+    font-weight: 700;
+    color: #475569;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+  }
+
+  /* Grid lines */
+  .grid-lines {
+    position: absolute;
+    left: 70px;
+    right: 0;
+    top: 0;
+    bottom: 60px;
+  }
+
+  .grid-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e2e8f0;
+  }
+
+  /* Bars container */
+  .bars-wrapper {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    flex: 1;
+    height: 340px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .bar-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    flex: 1;
+  }
+
+  .bar-value {
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    position: relative;
+  }
+
+  .bar-icon {
+    font-size: 22px;
+    margin-bottom: 4px;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bar {
+    width: 70px;
+    border-radius: 12px 12px 4px 4px;
+    position: relative;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .bar:hover {
+    transform: scaleY(1.02);
+    filter: brightness(1.08);
+  }
+
+  .bar-label {
+    margin-top: 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #475569;
+    text-align: center;
+  }
+
+  /* Bar colors */
+  .bar-1 { background: linear-gradient(180deg, #93c5fd, #60a5fa); }
+  .bar-1-val { color: #3b82f6; }
+
+  .bar-2 { background: linear-gradient(180deg, #60a5fa, #3b82f6); }
+  .bar-2-val { color: #2563eb; }
+
+  .bar-3 { background: linear-gradient(180deg, #6ee7b7, #34d399); }
+  .bar-3-val { color: #10b981; }
+
+  .bar-4 { background: linear-gradient(180deg, #bef264, #a3e635); }
+  .bar-4-val { color: #65a30d; }
+
+  .bar-5 { background: linear-gradient(180deg, #fdba74, #fb923c); }
+  .bar-5-val { color: #f97316; }
+
+  .bar-6 { background: linear-gradient(180deg, #fca5a5, #f87171); }
+  .bar-6-val { color: #ef4444; }
+
+  /* X-axis label */
+  .x-axis-title {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #475569;
+    margin-top: 10px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Legend at bottom */
+  .chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+  }
+
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+  }
+
+  /* Branding */
+  .branding {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .brand-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand-shield {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, #1a56db, #1e40af);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #d4a017;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    font-size: 20px;
+    color: #d4a017;
+  }
+
+  .brand-text h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    color: #1a56db;
+    line-height: 1.1;
+  }
+
+  .brand-text p {
+    font-size: 8px;
+    font-weight: 600;
+    color: #1a56db;
+    letter-spacing: 0.3px;
+  }
+
+  .brand-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cardiosense-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cardiosense-logo svg {
+    width: 32px;
+    height: 28px;
+  }
+
+  .cardiosense-logo span {
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f766e;
+    letter-spacing: 1px;
+  }
+
+  /* Animation */
+  @keyframes growUp {
+    from { transform: scaleY(0); }
+    to { transform: scaleY(1); }
+  }
+
+  .bar {
+    animation: growUp 0.8s ease-out forwards;
+    transform-origin: bottom center;
+  }
+
+  .bar-group:nth-child(1) .bar { animation-delay: 0.1s; }
+  .bar-group:nth-child(2) .bar { animation-delay: 0.2s; }
+  .bar-group:nth-child(3) .bar { animation-delay: 0.3s; }
+  .bar-group:nth-child(4) .bar { animation-delay: 0.4s; }
+  .bar-group:nth-child(5) .bar { animation-delay: 0.5s; }
+  .bar-group:nth-child(6) .bar { animation-delay: 0.6s; }
+
+</style>
+</head>
+<body>
+
+<div class="chart-container">
+
+  <!-- Title -->
+  <div class="chart-title">Health Improvement with CardioSense</div>
+  <div class="chart-subtitle">Tracking cardiovascular health performance over 6 weeks of intelligent BP monitoring</div>
+
+  <!-- Chart -->
+  <div class="chart-area">
+
+    <!-- Y-axis title -->
+    <div class="y-axis-title">Health Performance (%)</div>
+
+    <!-- Y-axis labels -->
+    <div class="y-axis">
+      <div class="y-label">0%</div>
+      <div class="y-label">20%</div>
+      <div class="y-label">40%</div>
+      <div class="y-label">60%</div>
+      <div class="y-label">80%</div>
+      <div class="y-label">100%</div>
+    </div>
+
+    <!-- Grid lines -->
+    <div class="grid-lines">
+      <div class="grid-line" style="bottom: 0%;"></div>
+      <div class="grid-line" style="bottom: 20%;"></div>
+      <div class="grid-line" style="bottom: 40%;"></div>
+      <div class="grid-line" style="bottom: 60%;"></div>
+      <div class="grid-line" style="bottom: 80%;"></div>
+      <div class="grid-line" style="bottom: 100%;"></div>
+    </div>
+
+    <!-- Bars -->
+    <div class="bars-wrapper">
+
+      <!-- Week 1 — 30% -->
+      <div class="bar-group">
+        <div class="bar-icon"></div>
+        <div class="bar-value bar-1-val">30%</div>
+        <div class="bar bar-1" style="height: 102px;"></div>
+        <div class="bar-label">Week 1</div>
+      </div>
+
+      <!-- Week 2 — 50% -->
+      <div class="bar-group">
+        <div class="bar-icon">🏅</div>
+        <div class="bar-value bar-2-val">50%</div>
+        <div class="bar bar-2" style="height: 170px;"></div>
+        <div class="bar-label">Week 2</div>
+      </div>
+
+      <!-- Week 3 — 65% -->
+      <div class="bar-group">
+        <div class="bar-icon"></div>
+        <div class="bar-value bar-3-val">65%</div>
+        <div class="bar bar-3" style="height: 221px;"></div>
+        <div class="bar-label">Week 3</div>
+      </div>
+
+      <!-- Week 4 — 75% -->
+      <div class="bar-group">
+        <div class="bar-icon">⭐</div>
+        <div class="bar-value bar-4-val">75%</div>
+        <div class="bar bar-4" style="height: 255px;"></div>
+        <div class="bar-label">Week 4</div>
+      </div>
+
+      <!-- Week 5 — 90% -->
+      <div class="bar-group">
+        <div class="bar-icon"></div>
+        <div class="bar-value bar-5-val">90%</div>
+        <div class="bar bar-5" style="height: 306px;"></div>
+        <div class="bar-label">Week 5</div>
+      </div>
+
+      <!-- Week 6 — 100% -->
+      <div class="bar-group">
+        <div class="bar-icon">🌟</div>
+        <div class="bar-value bar-6-val">100%</div>
+        <div class="bar bar-6" style="height: 340px;"></div>
+        <div class="bar-label">Week 6</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- X-axis title -->
+  <div class="x-axis-title">Week</div>
+
+  <!-- Legend -->
+  <div class="chart-legend">
+    <div class="legend-item">
+      <div class="legend-dot" style="background: #60a5fa;"></div>
+      Initial Monitoring
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background: #34d399;"></div>
+      Active Tracking
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background: #a3e635;"></div>
+      AI Insights Enabled
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background: #fb923c;"></div>
+      Predictive Alerts Active
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background: #f87171;"></div>
+      Full System Optimization
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

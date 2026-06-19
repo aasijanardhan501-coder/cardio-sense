@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CardioSense - Graphical Abstract</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #ffffff;
+    font-family: 'Inter', 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .poster {
+    width: 1400px;
+    height: 1000px;
+    background: #ffffff;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* TOP HEADER */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 18px 30px 10px 30px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .logo-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-shield {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #1a56db, #1e40af);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #d4a017;
+    position: relative;
+  }
+
+  .logo-shield::after {
+    content: "V";
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    font-size: 32px;
+    color: #d4a017;
+  }
+
+  .logo-text h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 26px;
+    font-weight: 900;
+    color: #1a56db;
+    letter-spacing: 1px;
+    line-height: 1.1;
+  }
+
+  .logo-text p {
+    font-size: 10px;
+    font-weight: 700;
+    color: #1a56db;
+    letter-spacing: 0.5px;
+    line-height: 1.3;
+  }
+
+  .ga-banner {
+    background: linear-gradient(135deg, #1a56db, #1e3a8a);
+    padding: 14px 40px;
+    border-radius: 8px;
+    position: relative;
+  }
+
+  .ga-banner h2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 1px;
+  }
+
+  .ga-banner::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 40px;
+    right: 40px;
+    height: 3px;
+    background: #d4a017;
+    border-radius: 2px;
+  }
+
+  /* MIND MAP CONTAINER */
+  .mindmap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 1400px;
+    height: 900px;
+  }
+
+  /* SVG LINES */
+  .mindmap svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* CENTER BUBBLE */
+  .center-bubble {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 320px;
+    height: 160px;
+    background: linear-gradient(145deg, #0d9488, #0f766e, #115e59);
+    border-radius: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    box-shadow: 0 8px 32px rgba(13, 148, 136, 0.35);
+  }
+
+  .center-heart {
+    width: 56px;
+    height: 50px;
+    margin-bottom: 4px;
+    position: relative;
+    filter: drop-shadow(0 2px 6px rgba(220,38,38,0.4));
+  }
+
+  .center-bubble h2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+
+  .center-bubble p {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+    margin-top: 4px;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  /* BRANCHES */
+  .branch {
+    position: absolute;
+    z-index: 5;
+    width: 220px;
+  }
+
+  .branch-header {
+    display: inline-block;
+    padding: 7px 18px;
+    border-radius: 25px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  .branch-items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-left: 4px;
+  }
+
+  .branch-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #334155;
+    line-height: 1.4;
+  }
+
+  .branch-item .icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    width: 22px;
+    text-align: center;
+  }
+
+  /* ===== BRANCH POSITIONS (Compass layout) ===== */
+
+  /* TOP (12 o'clock) — IoT Simulation */
+  .branch-top {
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+  }
+  .branch-top .branch-header { background: linear-gradient(135deg, #f97316, #ea580c); }
+  .branch-top .branch-items { align-items: center; padding-left: 0; }
+
+  /* TOP-RIGHT (1-2 o'clock) — AI Analytics */
+  .branch-top-right {
+    top: 60px;
+    right: 40px;
+    text-align: left;
+  }
+  .branch-top-right .branch-header { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+
+  /* RIGHT (3 o'clock) — Doctor Access */
+  .branch-right {
+    top: 50%;
+    right: 30px;
+    transform: translateY(-50%);
+    text-align: left;
+  }
+  .branch-right .branch-header { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+  /* BOTTOM-RIGHT (4-5 o'clock) — Notifications */
+  .branch-bottom-right {
+    bottom: 40px;
+    right: 40px;
+    text-align: left;
+  }
+  .branch-bottom-right .branch-header { background: linear-gradient(135deg, #e11d48, #be123c); }
+
+  /* BOTTOM (6 o'clock) — Data Export */
+  .branch-bottom {
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+  }
+  .branch-bottom .branch-header { background: linear-gradient(135deg, #16a34a, #15803d); }
+  .branch-bottom .branch-items { align-items: center; padding-left: 0; }
+
+  /* BOTTOM-LEFT (7-8 o'clock) — Security */
+  .branch-bottom-left {
+    bottom: 40px;
+    left: 40px;
+    text-align: right;
+  }
+  .branch-bottom-left .branch-header { background: linear-gradient(135deg, #0891b2, #0e7490); }
+  .branch-bottom-left .branch-items { align-items: flex-end; }
+  .branch-bottom-left .branch-item { flex-direction: row-reverse; }
+
+  /* LEFT (9 o'clock) — User Interface */
+  .branch-left {
+    top: 50%;
+    left: 30px;
+    transform: translateY(-50%);
+    text-align: right;
+  }
+  .branch-left .branch-header { background: linear-gradient(135deg, #84cc16, #65a30d); }
+  .branch-left .branch-items { align-items: flex-end; }
+  .branch-left .branch-item { flex-direction: row-reverse; }
+
+  /* TOP-LEFT (10-11 o'clock) — BP Monitoring */
+  .branch-top-left {
+    top: 60px;
+    left: 40px;
+    text-align: right;
+  }
+  .branch-top-left .branch-header { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+  .branch-top-left .branch-items { align-items: flex-end; }
+  .branch-top-left .branch-item { flex-direction: row-reverse; }
+
+  /* Print styles */
+  @media print {
+    body { padding: 0; }
+    .poster { width: 100%; height: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="poster">
+
+
+
+  <!-- MIND MAP -->
+  <div class="mindmap">
+
+    <!-- SVG CURVED LINES -->
+    <svg viewBox="0 0 1400 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Center point: 700, 450 -->
+
+      <!-- TOP — IoT Simulation (orange) -->
+      <path d="M700,370 C700,320 700,270 700,220" stroke="#f97316" stroke-width="8" stroke-linecap="round" fill="none"/>
+
+      <!-- TOP-RIGHT — AI Analytics (purple) -->
+      <path d="M800,400 C870,370 960,310 1060,260" stroke="#8b5cf6" stroke-width="8" stroke-linecap="round" fill="none"/>
+
+      <!-- RIGHT — Doctor Access (red) -->
+      <path d="M860,450 C940,450 1020,450 1100,450" stroke="#ef4444" stroke-width="8" stroke-linecap="round" fill="none"/>
+
+      <!-- BOTTOM-RIGHT — Notifications (rose) -->
+      <path d="M800,500 C870,540 960,600 1060,660" stroke="#e11d48" stroke-width="8" stroke-linecap="round" fill="none"/>
+
+      <!-- BOTTOM — Data Export (green) -->
+      <path d="M700,530 C700,590 700,650 700,710" stroke="#16a34a" stroke-width="8" stroke-linecap="round" fill="none"/>
+
+      <!-- BOTTOM-LEFT — Security (teal) -->
+      <path d="M600,500 C530,540 440,600 340,660" stroke="#0891b2" stroke-width="8" stroke-linecap="round" fill="none"/>
+
+      <!-- LEFT — User Interface (lime) -->
+      <path d="M540,450 C460,450 380,450 300,450" stroke="#84cc16" stroke-width="8" stroke-linecap="round" fill="none"/>
+
+      <!-- TOP-LEFT — BP Monitoring (blue) -->
+      <path d="M600,400 C530,370 440,310 340,260" stroke="#3b82f6" stroke-width="8" stroke-linecap="round" fill="none"/>
+    </svg>
+
+    <!-- CENTER BUBBLE -->
+    <div class="center-bubble">
+      <div class="center-heart">
+        <svg viewBox="0 0 56 50" xmlns="http://www.w3.org/2000/svg">
+          <!-- Red Heart -->
+          <path d="M28 45 C28 45 4 30 4 16 C4 8 10 2 18 2 C22 2 26 5 28 8 C30 5 34 2 38 2 C46 2 52 8 52 16 C52 30 28 45 28 45Z" fill="#ef4444"/>
+          <!-- White ECG Pulse Line -->
+          <polyline points="6,22 16,22 20,14 24,30 28,18 32,26 36,20 40,22 50,22" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>CARDIOSENSE</h2>
+      <p>Intelligent Blood Pressure<br>Tracking System</p>
+    </div>
+
+    <!-- BRANCH: TOP (12 o'clock) — IoT Simulation -->
+    <div class="branch branch-top">
+      <div class="branch-header">IoT Simulation</div>
+      <div class="branch-items">
+        <div class="branch-item"><span class="icon">⚡</span> Real-Time Streaming</div>
+        <div class="branch-item"><span class="icon">📡</span> Socket.IO Protocol</div>
+        <div class="branch-item"><span class="icon">🔄</span> Sensor Simulation</div>
+        <div class="branch-item"><span class="icon">📊</span> Live Dashboard</div>
+        <div class="branch-item"><span class="icon">🔔</span> Alert System</div>
+      </div>
+    </div>
+
+    <!-- BRANCH: TOP-LEFT (10-11 o'clock) — BP Monitoring -->
+    <div class="branch branch-top-left">
+      <div class="branch-header">BP Monitoring</div>
+      <div class="branch-items">
+        <div class="branch-item"><span class="icon">📊</span> Systolic Pressure</div>
+        <div class="branch-item"><span class="icon">📈</span> Diastolic Pressure</div>
+        <div class="branch-item"><span class="icon">💓</span> Heart Rate / Pulse</div>
+        <div class="branch-item"><span class="icon">📱</span> Device Status</div>
+        <div class="branch-item"><span class="icon">🔋</span> Battery Level</div>
+      </div>
+    </div>
+
+    <!-- BRANCH: TOP-RIGHT (1-2 o'clock) — AI Analytics -->
+    <div class="branch branch-top-right">
+      <div class="branch-header">AI Analytics</div>
+      <div class="branch-items">
+        <div class="branch-item"><span class="icon">🎯</span> Risk Assessment</div>
+        <div class="branch-item"><span class="icon">💡</span> Health Insights</div>
+        <div class="branch-item"><span class="icon">📈</span> Trend Analysis</div>
+        <div class="branch-item"><span class="icon">🔍</span> Anomaly Detection</div>
+        <div class="branch-item"><span class="icon">⚠️</span> Predictive Alerts</div>
+      </div>
+    </div>
+
+    <!-- BRANCH: LEFT (9 o'clock) — User Interface -->
+    <div class="branch branch-left">
+      <div class="branch-header">User Interface</div>
+      <div class="branch-items">
+        <div class="branch-item"><span class="icon">⚛️</span> React Dashboard</div>
+        <div class="branch-item"><span class="icon">🌙</span> Dark / Light Mode</div>
+        <div class="branch-item"><span class="icon">📱</span> Responsive Design</div>
+        <div class="branch-item"><span class="icon">✨</span> Smooth Animations</div>
+        <div class="branch-item"><span class="icon">🎨</span> Custom Avatars</div>
+      </div>
+    </div>
+
+    <!-- BRANCH: RIGHT (3 o'clock) — Doctor Access -->
+    <div class="branch branch-right">
+      <div class="branch-header">Doctor Access</div>
+      <div class="branch-items">
+        <div class="branch-item"><span class="icon">🔗</span> Secure Sharing Links</div>
+        <div class="branch-item"><span class="icon">📱</span> QR Code Access</div>
+        <div class="branch-item"><span class="icon">⏰</span> Time-Limited Access</div>
+        <div class="branch-item"><span class="icon">📋</span> Activity Audit Logs</div>
+        <div class="branch-item"><span class="icon">🔒</span> Permission Levels</div>
+      </div>
+    </div>
+
+    <!-- BRANCH: BOTTOM-LEFT (7-8 o'clock) — Security -->
+    <div class="branch branch-bottom-left">
+      <div class="branch-header">Security</div>
+      <div class="branch-items">
+        <div class="branch-item"><span class="icon">🔐</span> Google Authentication</div>
+        <div class="branch-item"><span class="icon">🛡️</span> Firebase Rules</div>
+        <div class="branch-item"><span class="icon">🔒</span> Encrypted Data</div>
+        <div class="branch-item"><span class="icon">👤</span> User Profiles</div>
+        <div class="branch-item"><span class="icon">📧</span> Email Verification</div>
+      </div>
+    </div>
+
+    <!-- BRANCH: BOTTOM-RIGHT (4-5 o'clock) — Notifications & Alerts -->
+    <div class="branch branch-bottom-right">
+      <div class="branch-header">Notifications & Alerts</div>
+      <div class="branch-items">
+        <div class="branch-item"><span class="icon">🔔</span> Real-Time BP Alerts</div>
+        <div class="branch-item"><span class="icon">📧</span> Email Notifications</div>
+        <div class="branch-item"><span class="icon">🚨</span> Emergency Warnings</div>
+        <div class="branch-item"><span class="icon">📊</span> Threshold Monitoring</div>
+        <div class="branch-item"><span class="icon">🕐</span> Smart Reminders</div>
+      </div>
+    </div>
+
+    <!-- BRANCH: BOTTOM (6 o'clock) — Data Export -->
+    <div class="branch branch-bottom">
+      <div class="branch-header">Data Export</div>
+      <div class="branch-items">
+        <div class="branch-item"><span class="icon">📄</span> PDF Reports</div>
+        <div class="branch-item"><span class="icon">📊</span> Excel Export</div>
+        <div class="branch-item"><span class="icon">📋</span> Health Records</div>
+        <div class="branch-item"><span class="icon">📈</span> Data Visualization</div>
+        <div class="branch-item"><span class="icon">📅</span> Historical Data</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

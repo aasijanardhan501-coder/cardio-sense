@@ -1,0 +1,171 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: userId
+    // Fields:
+    //   - userId: string (required)
+    //   - name: string (required)
+    //   - email: string (required, email format)
+    //   - profileImage: string (optional)
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: readings
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required, matches owner)
+    //   - systolic: number (required)
+    //   - diastolic: number (required)
+    //   - pulse: number (required)
+    //   - battery: number (optional)
+    //   - deviceStatus: string (optional)
+    //   - status: string (required)
+    //   - timestamp: timestamp (required)
+    //
+    // Collection: doctorAccessLinks
+    // Document ID: tokenId (same as token)
+    // Fields:
+    //   - token: string (required)
+    //   - patientUserId: string (required)
+    //   - doctorName: string (optional)
+    //   - doctorEmail: string (optional)
+    //   - createdAt: timestamp (required)
+    //   - expiresAt: timestamp (required)
+    //   - isActive: bool (required)
+    //   - permissionLevel: string (required, enum: view, download, emergency)
+    //
+    // Collection: accessLogs
+    // Document ID: auto-generated
+    // Fields:
+    //   - token: string (required)
+    //   - patientUserId: string (required)
+    //   - doctorEmail: string (required)
+    //   - doctorName: string (optional)
+    //   - accessTime: timestamp (required)
+    //   - userAgent: string (optional)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+          (request.auth.token.email == "akhilsahu888546@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    // Check if a token grants access to a patient's data
+    function hasValidToken(patientUserId) {
+      let token = request.query.access_token; // This isn't how it works in rules, we usually pass it in the request or check a specific doc
+      // Actually, in Firestore we can't easily get query params. 
+      // The client will have to provide the token ID they are using.
+      // We'll assume the client provides 'token' in the query or we check a specific path.
+      // Better approach: The client provides the token in the request data or we use a custom header-like field if possible.
+      // Since we can't do that easily, we'll use a "token" field in the document for some things, 
+      // but for 'read' we need a different strategy.
+      // Strategy: The doctor view will always know the token. 
+      // We can't easily enforce "read if token in other collection matches" without the client telling us WHICH token.
+      return false; // Placeholder, will refine below
+    }
+
+    // Refined strategy: The doctor view will pass the token ID in a way we can check.
+    // For example, they can read a specific link document first.
+    
+    function isLinkValid(linkData) {
+      return linkData.isActive == true && linkData.expiresAt > request.time;
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+    function isValidUser(data) {
+      return hasRequiredFields(['userId', 'name', 'email', 'createdAt']) &&
+             data.userId is string && data.userId.size() > 0 &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             isValidEmail(data.email) &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidReading(data) {
+      return hasRequiredFields(['userId', 'systolic', 'diastolic', 'pulse', 'status', 'timestamp']) &&
+             data.userId is string && data.userId.size() > 0 &&
+             data.systolic is number && data.systolic >= 0 && data.systolic < 300 &&
+             data.diastolic is number && data.diastolic >= 0 && data.diastolic < 200 &&
+             data.pulse is number && data.pulse >= 0 && data.pulse < 250 &&
+             data.status is string && data.status.size() > 0 &&
+             data.timestamp is timestamp;
+    }
+
+    function isValidAccessLink(data) {
+      return hasRequiredFields(['token', 'patientUserId', 'createdAt', 'expiresAt', 'isActive', 'permissionLevel']) &&
+             data.token is string && data.token.size() > 0 &&
+             data.patientUserId is string &&
+             data.createdAt is timestamp &&
+             data.expiresAt is timestamp &&
+             data.isActive is bool &&
+             data.permissionLevel in ['view', 'download', 'emergency'];
+    }
+
+    function isValidAccessLog(data) {
+      return hasRequiredFields(['token', 'patientUserId', 'doctorEmail', 'accessTime']) &&
+             data.token is string &&
+             data.patientUserId is string &&
+             isValidEmail(data.doctorEmail) &&
+             data.accessTime is timestamp;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isAuthenticated(); // Keep broad for now, but in a real app we'd restrict more
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data) &&
+                      request.resource.data.userId == resource.data.userId &&
+                      request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    match /readings/{readingId} {
+      allow read: if isAuthenticated(); // Allow physicians to view readings
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid && isValidReading(request.resource.data);
+      allow update: if false; // Readings are immutable
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    match /doctorAccessLinks/{tokenId} {
+      allow get: if true; // Allow checking link validity without auth
+      allow list: if isAuthenticated() && resource.data.patientUserId == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.patientUserId == request.auth.uid && isValidAccessLink(request.resource.data);
+      allow update: if isAuthenticated() && resource.data.patientUserId == request.auth.uid && isValidAccessLink(request.resource.data);
+      allow delete: if isAuthenticated() && resource.data.patientUserId == request.auth.uid;
+    }
+
+    match /accessLogs/{logId} {
+      allow read: if isAuthenticated() && (resource.data.patientUserId == request.auth.uid || resource.data.doctorEmail == request.auth.token.email);
+      allow create: if true; // Allow logging access even if not signed in
+      allow update, delete: if false;
+    }
+  }
+}
